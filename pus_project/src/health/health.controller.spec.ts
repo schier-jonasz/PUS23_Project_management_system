@@ -12,7 +12,14 @@ describe('HealthController', () => {
     controller = module.get<HealthController>(HealthController);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  describe('healthcheck', () => {
+    it('should return "ok" for each service', () => {
+      expect(controller.checkHealth()).toEqual({
+        redis: 'ok',
+        postgres: 'ok',
+        mongo: 'ok',
+        rabbit: 'ok',
+      });
+    });
   });
 });

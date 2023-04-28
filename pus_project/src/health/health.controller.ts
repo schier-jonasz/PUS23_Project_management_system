@@ -1,13 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
-import { HealthCheckResult } from '@nestjs/terminus';
 import { HealthService } from './health.service';
+import { HealthCheckConnectionStatuses } from './health.interface';
 
 @Controller('health')
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
 
   @Get()
-  async checkHealth(): Promise<HealthCheckResult> {
+  async checkHealth(): Promise<HealthCheckConnectionStatuses> {
     return await this.healthService.checkHealth();
   }
 }
