@@ -3,49 +3,51 @@ import { Injectable } from '@nestjs/common';
 import {
   HealthCheckService,
   HealthCheck,
-  MongooseHealthIndicator,
   TypeOrmHealthIndicator,
-  MicroserviceHealthIndicator,
+  MongooseHealthIndicator,
 } from '@nestjs/terminus';
-import { HealthCheckConnectionStatuses } from './health.interface';
+import { ServiceHealthCheckStatus } from './enums/service-status.enum';
+import { ServiceEnum } from './enums/service.enum';
+import { HealthIndicatorStatus } from '@nestjs/terminus/dist/health-indicator/health-indicator-result.interface';
 
 @Injectable()
 export class HealthService {
   constructor(
     private readonly health: HealthCheckService,
+    // private readonly redis: MicroserviceHealthIndicator,
     private readonly mongo: MongooseHealthIndicator,
     private readonly postgres: TypeOrmHealthIndicator,
-    private readonly redis: MicroserviceHealthIndicator,
   ) {}
 
   @HealthCheck()
   async checkHealth() {
-    // const healthCheckResult = await this.health.check([
-    //   () => this.mongo.pingCheck('mongo'),
-    //   () => this.postgres.pingCheck('db1'),
-    //   // () =>
-    //   //   this.redis.pingCheck<RedisOptions>('redis', {
-    //   //     transport: Transport.REDIS,
-    //   //     options: {
-    //   //       url: 'redis://localhost:6379',
-    //   //     },
-    //   //   }),
-    // ]);
-    //
-    // const connectionStatuses = {
-    //   mongo: healthCheckResult.details.mongo.status === 'up' ? 'ok' : 'failed',
-    //   postgres: healthCheckResult.details.db1.status === 'up' ? 'ok' : 'failed',
-    // };
+    const { info } = await this.health.check([
+      () => this.postgres.pingCheck(ServiceEnum.POSTGRES),
+      () => this.mongo.pingCheck(ServiceEnum.MONGO_DB),
+      // () =>
+      //   this.redis.pingCheck<RedisOptions>('redis', {
+      //     transport: Transport.REDIS,
+      //     options: {
+      //       url: 'redis://localhost:6379',
+      //     },
+      //   }),
+    ]);
 
-    return this.mapToResponse();
+    console.log(info);
+
+    return {
+      mongo: this.getStatusMessage(info[ServiceEnum.MONGO_DB].status),
+      postgres: this.getStatusMessage(info[ServiceEnum.POSTGRES].status),
+      // redis: this.getStatusMessage(result.info[ServiceEnum.REDIS].status),
+      // rabbit: this.getStatusMessage(result.info[ServiceEnum.RABBIT_MQ].status),
+    };
   }
 
-  private mapToResponse(): HealthCheckConnectionStatuses {
-    return {
-      mongo: 'ok',
-      postgres: 'ok',
-      redis: 'ok',
-      rabbit: 'ok',
-    };
+  private getStatusMessage(
+    status: HealthIndicatorStatus,
+  ): ServiceHealthCheckStatus {
+    return status === 'up'
+      ? ServiceHealthCheckStatus.HEALTHY
+      : ServiceHealthCheckStatus.UNHEALTHY;
   }
 }
