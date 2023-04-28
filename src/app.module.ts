@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { HealthModule } from './health/health.module';
-import { AppService } from './app.service';
-import { HttpModule } from '@nestjs/axios';
-import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     MongooseModule.forRoot(
       'mongodb://root:example@mongo:27017/database_mongo?tls=false&ssl=false&authSource=admin',
     ),
@@ -23,10 +21,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: true,
     }),
     HealthModule,
-    HttpModule,
-    TerminusModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

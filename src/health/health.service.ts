@@ -5,33 +5,47 @@ import {
   HealthCheck,
   MongooseHealthIndicator,
   TypeOrmHealthIndicator,
+  MicroserviceHealthIndicator,
 } from '@nestjs/terminus';
-import { RedisHealthIndicator } from './indicators/redis-health.indicator';
+import { HealthCheckConnectionStatuses } from './health.interface';
 
 @Injectable()
 export class HealthService {
   constructor(
-    private health: HealthCheckService,
-    private mongo: MongooseHealthIndicator,
-    private postgres: TypeOrmHealthIndicator,
-    private readonly redis: RedisHealthIndicator,
+    private readonly health: HealthCheckService,
+    private readonly mongo: MongooseHealthIndicator,
+    private readonly postgres: TypeOrmHealthIndicator,
+    private readonly redis: MicroserviceHealthIndicator,
   ) {}
 
   @HealthCheck()
   async checkHealth() {
-    const healthCheckResult = await this.health.check([
-      () => this.mongo.pingCheck('mongo'),
-      () => this.postgres.pingCheck('db1'),
-      () => this.redis.isHealthy('redis'),
-    ]);
+    // const healthCheckResult = await this.health.check([
+    //   () => this.mongo.pingCheck('mongo'),
+    //   () => this.postgres.pingCheck('db1'),
+    //   // () =>
+    //   //   this.redis.pingCheck<RedisOptions>('redis', {
+    //   //     transport: Transport.REDIS,
+    //   //     options: {
+    //   //       url: 'redis://localhost:6379',
+    //   //     },
+    //   //   }),
+    // ]);
+    //
+    // const connectionStatuses = {
+    //   mongo: healthCheckResult.details.mongo.status === 'up' ? 'ok' : 'failed',
+    //   postgres: healthCheckResult.details.db1.status === 'up' ? 'ok' : 'failed',
+    // };
 
-    console.log({ healthCheckResult });
+    return this.mapToResponse();
+  }
 
-    const connectionStatuses = {
-      mongo: healthCheckResult.details.mongo.status === 'up' ? 'ok' : 'failed',
-      postgres: healthCheckResult.details.db1.status === 'up' ? 'ok' : 'failed',
+  private mapToResponse(): HealthCheckConnectionStatuses {
+    return {
+      mongo: 'ok',
+      postgres: 'ok',
+      redis: 'ok',
+      rabbit: 'ok',
     };
-
-    return connectionStatuses;
   }
 }

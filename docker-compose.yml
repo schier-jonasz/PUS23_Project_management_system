@@ -1,4 +1,4 @@
-version: "3.6"
+version: '3.6'
 
 services:
   mongo:
@@ -7,25 +7,25 @@ services:
     container_name: mongo
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-      MONGO_INITDB_DATABASE: database_mongo
-      MONGO_INITDB_USER: root
-      MONGO_INITDB_PWD: example
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_INITDB_USER: ${MONGO_INITDB_USER}
+      MONGO_INITDB_PWD: ${MONGO_INITDB_PWD}
     networks:
       - my-network
     ports:
       - '28017:27017'
 
   postgres:
-      image: postgres
-      restart: always
-      ports:
-        - 5432:5432
-      environment:
-        POSTGRES_PASSWORD: postgres
-      networks:
-        - my-network
+    image: postgres
+    restart: always
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - my-network
 
   rabbitmq:
     image: rabbitmq:3.10-management
@@ -35,18 +35,18 @@ services:
       - '5672:5672'
       - '15672:15672'
     environment:
-      RABBITMQ_DEFAULT_USER: 'rabbitmq'
-      RABBITMQ_DEFAULT_PASS: 'example'
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     networks:
       - my-network
 
   redis:
     image: 'redis:latest'
     ports:
-      - '6379:6379'
+      - '${REDIS_PORT}:${REDIS_PORT}'
     environment:
-      REDIS_PASSWORD: 'example'
-    volumes: 
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
       - ./src:/usr/src/app/src/data
     networks:
       - my-network
@@ -57,14 +57,13 @@ services:
       dockerfile: Dockerfile
     command: npm run start:dev
     ports:
-      - 8000:8000
+      - '${APP_PORT}:${APP_PORT}'
     environment:
-      - MONGODB_URL=mongodb://root:example@mongo:27017/pus-project
-      - NODE_ENV=production
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=example
-      # MONGO_URL: root:root@localhost
+      MONGODB_URL: ${MONGODB_URL}
+      NODE_ENV: ${NODE_ENV}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     networks:
       - my-network
     volumes:
