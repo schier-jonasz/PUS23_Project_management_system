@@ -32,8 +32,8 @@ services:
     container_name: rabbitmq
     hostname: pus-broker
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - '${RABBITMQ_PORT}:${RABBITMQ_PORT}'
+      - '${RABBITMQ_MGMT_PORT}:${RABBITMQ_MGMT_PORT}'
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
