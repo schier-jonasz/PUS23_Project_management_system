@@ -1,0 +1,77 @@
+version: '3.6'
+
+services:
+  mongo:
+    image: mongo
+    hostname: mongo
+    container_name: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_INITDB_USER: ${MONGO_INITDB_USER}
+      MONGO_INITDB_PWD: ${MONGO_INITDB_PWD}
+    networks:
+      - my-network
+    ports:
+      - '28017:27017'
+
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - my-network
+
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    container_name: rabbitmq
+    hostname: pus-broker
+    ports:
+      - '${RABBITMQ_PORT}:${RABBITMQ_PORT}'
+      - '${RABBITMQ_MGMT_PORT}:${RABBITMQ_MGMT_PORT}'
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - my-network
+
+  redis:
+    image: 'redis:latest'
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - ./src:/usr/src/app/src/data
+    networks:
+      - my-network
+
+  pus-project:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npm run start:dev
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    environment:
+      MONGODB_URL: ${MONGODB_URL}
+      NODE_ENV: ${NODE_ENV}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - my-network
+    volumes:
+      - ./src:/usr/src/app/src
+    depends_on:
+      - mongo
+      - redis
+
+networks:
+  my-network:
+    driver: bridge

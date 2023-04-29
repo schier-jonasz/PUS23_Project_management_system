@@ -20,3 +20,16 @@ jak informacje o projektach, zadaniach, członkach zaspołu i harmonogramie.
 - MongoDB | Baza do przechowywania danych na temat zdarzeń, które wystąpiły w systemie.
 - Redis | Baza do przechowywania tymczasowych danych. W projekcie będzie służyć jako warstwa cachująca, która pozwala na ograniczenia ilości zapytań do bazy danych.
 - RabbitMQ | Zapewni asynchroniczną komunikację w systemie. Pozwoli na emisję zdarzeń przez API, a następnie konsumowanie ich przez drugą usługę.
+
+
+## Sposób uruchomienia:
+
+1. Tworzymy plik `.env` i uzupełniamy go danymi:
+```
+cp .env.example .env
+```
+
+2. Budujemy obraz dockerowy:
+```
+docker-compose up --build
+```
