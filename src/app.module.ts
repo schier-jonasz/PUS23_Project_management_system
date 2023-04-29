@@ -7,16 +7,14 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(
-      'mongodb://root:example@mongo:27017/database_mongo?tls=false&ssl=false&authSource=admin',
-    ),
+    MongooseModule.forRoot(process.env.MONGO_URL),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'postgres', // match the container name in docker-compose file
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'postgres',
+      host: process.env.POSTGRES_HOST, // match the container name in docker-compose file
+      port: Number(process.env.POSTGRES_PORT),
+      username: process.env.POSTGRES_USERNAME,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DB_NAME,
       autoLoadEntities: true,
       synchronize: true,
     }),

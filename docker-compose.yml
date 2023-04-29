@@ -3,7 +3,7 @@ version: '3.6'
 services:
   mongo:
     image: mongo
-    hostname: mongo
+    hostname: ${MONGO_HOST}
     container_name: mongo
     restart: always
     environment:
@@ -15,7 +15,7 @@ services:
     networks:
       - my-network
     ports:
-      - '28017:27017'
+      - '${MONGO_PORT}:${MONGO_PORT}'
 
   postgres:
     image: postgres
@@ -30,7 +30,7 @@ services:
   rabbitmq:
     image: rabbitmq:3.10-management
     container_name: rabbitmq
-    hostname: pus-broker
+    hostname: ${RABBITMQ_HOST}
     ports:
       - '${RABBITMQ_PORT}:${RABBITMQ_PORT}'
       - '${RABBITMQ_MGMT_PORT}:${RABBITMQ_MGMT_PORT}'
@@ -58,12 +58,6 @@ services:
     command: npm run start:dev
     ports:
       - '${APP_PORT}:${APP_PORT}'
-    environment:
-      MONGODB_URL: ${MONGODB_URL}
-      NODE_ENV: ${NODE_ENV}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
     networks:
       - my-network
     volumes:
