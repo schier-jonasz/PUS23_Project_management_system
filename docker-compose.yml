@@ -68,6 +68,7 @@ services:
       - my-network
     volumes:
       - ./src:/usr/src/app/src
+      - ./node_modules:/usr/src/app/node_modules
     depends_on:
       - mongo
       - redis
