@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 import { addMinutes, isAfter } from 'date-fns';
 import { VerificationRepository } from './verification.repository';
@@ -13,14 +14,16 @@ import {
 export class VerificationService {
   constructor(
     private verificationRepository: VerificationRepository,
+    private configService: ConfigService,
     @Inject(Logger) private readonly logger: LoggerService,
   ) {}
 
   async createUserVerification(userId: UserId) {
     const verificationCode = this.generateVerificationCode();
     const expirationInMinutes = Number(
-      process.env.VERIFICATION_CODE_EXPIRATION_IN_MINUTES,
+      this.configService.get('VERIFICATION_CODE_EXPIRATION_IN_MINUTES'),
     );
+    console.log({ expirationInMinutes });
 
     const userVerification = await this.verificationRepository.save({
       verificationCode,

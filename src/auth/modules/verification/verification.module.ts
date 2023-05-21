@@ -6,6 +6,7 @@ import {
   UserVerificationSchema,
 } from './verification.schema';
 import { VerificationRepository } from './verification.repository';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -13,7 +14,12 @@ import { VerificationRepository } from './verification.repository';
       { name: UserVerification.name, schema: UserVerificationSchema },
     ]),
   ],
-  providers: [VerificationService, VerificationRepository, Logger],
+  providers: [
+    VerificationService,
+    VerificationRepository,
+    ConfigService,
+    Logger,
+  ],
   exports: [VerificationService],
 })
 export class VerificationModule {}

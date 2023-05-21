@@ -5,11 +5,14 @@ import {
   Logger,
   LoggerService,
 } from '@nestjs/common';
-import { RegisterUserDto } from './dtos';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { LoginUserDto, RegisterUserDto } from './dtos';
 import { UserService } from './modules/user/user.service';
 import { CryptoService } from './modules/crypto/crypto.service';
 import { VerificationService } from './modules/verification/verification.service';
 import { VerificationCode } from './modules/verification/verification.schema';
+import { User } from './modules/user/user.model';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +20,8 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly cryptoService: CryptoService,
     private readonly verificationService: VerificationService,
+    private readonly jwtService: JwtService,
+    private readonly config: ConfigService,
     @Inject(Logger) private readonly logger: LoggerService,
   ) {}
 
@@ -84,11 +89,58 @@ export class AuthService {
     };
   }
 
-  async login() {
-    return this.verificationService.getAll();
+  async login({ email, password }: LoginUserDto) {
+    const user = await this.userService.getByEmail(email);
+    if (!user) {
+      this.logger.log(
+        `User with given email does not exist. email: [${email}]`,
+      );
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    const hashedPassword = user.password;
+    const passwordsMatch = await this.cryptoService.comparePasswords(
+      password,
+      hashedPassword,
+    );
+    if (!passwordsMatch) {
+      this.logger.log(`User provided bad password. email: [${email}]`);
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    const isActivated = user.isActive;
+    if (!isActivated) {
+      this.logger.log(`User has not activated account. email: [${email}]`);
+      throw new BadRequestException('You need to activate account to log in');
+    }
+
+    const payload = this.getJwtPayload(user);
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: this.config.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME'),
+      secret: this.config.get('JWT_SECRET'),
+    });
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      expiresIn: this.config.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME'),
+      secret: this.config.get('JWT_SECRET'),
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   async refreshTokens() {
-    return 'todo';
+    return this.verificationService.getAll();
+  }
+
+  private getJwtPayload(user: User) {
+    return {
+      sub: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      isActive: user.isActive,
+    };
   }
 }
