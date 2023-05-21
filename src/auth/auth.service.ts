@@ -12,7 +12,15 @@ import { UserService } from './modules/user/user.service';
 import { CryptoService } from './modules/crypto/crypto.service';
 import { VerificationService } from './modules/verification/verification.service';
 import { VerificationCode } from './modules/verification/verification.schema';
-import { User } from './modules/user/user.model';
+import { User, UserId } from './modules/user/user.model';
+
+interface JwtPayload {
+  sub: UserId;
+  firstName: string;
+  lastName: string;
+  email: string;
+  isActive: boolean;
+}
 
 @Injectable()
 export class AuthService {
@@ -115,6 +123,44 @@ export class AuthService {
     }
 
     const payload = this.getJwtPayload(user);
+
+    return this.getTokens(payload);
+  }
+
+  async refreshTokens(token: string) {
+    const isValid = await this.jwtService.verifyAsync(token, {
+      secret: this.config.get('JWT_SECRET'),
+    });
+    if (!isValid) {
+      this.logger.log(`Invalid refresh token. token: [${token}]`);
+      throw new BadRequestException('Invalid token');
+    }
+
+    const { sub: userId } = this.jwtService.decode(token) as { sub: UserId };
+    const user = await this.userService.getById(userId);
+    if (!user) {
+      this.logger.log(
+        `User with the ID passed in token does not exist. userId: [${userId}]`,
+      );
+      throw new BadRequestException('Invalid token');
+    }
+
+    const payload = this.getJwtPayload(user);
+
+    return this.getTokens(payload);
+  }
+
+  private getJwtPayload(user: User): JwtPayload {
+    return {
+      sub: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      isActive: user.isActive,
+    };
+  }
+
+  private async getTokens(payload: JwtPayload) {
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: this.config.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME'),
       secret: this.config.get('JWT_SECRET'),
@@ -127,20 +173,6 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
-    };
-  }
-
-  async refreshTokens() {
-    return this.verificationService.getAll();
-  }
-
-  private getJwtPayload(user: User) {
-    return {
-      sub: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      isActive: user.isActive,
     };
   }
 }

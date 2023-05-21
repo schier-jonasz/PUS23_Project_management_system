@@ -29,10 +29,6 @@ export class VerificationRepository {
     return this.model.findOne({ verificationCode }, { new: true });
   }
 
-  public async getAll(): Promise<UserVerification[]> {
-    return this.model.find();
-  }
-
   public async update(
     id: UserVerificationId,
     props: Partial<UserVerification>,

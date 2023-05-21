@@ -54,10 +54,6 @@ export class VerificationService {
     return this.verificationRepository.update(id, { isUsed: true });
   }
 
-  async getAll() {
-    return this.verificationRepository.getAll(); // todo: remove me
-  }
-
   private generateVerificationCode() {
     return randomUUID();
   }
