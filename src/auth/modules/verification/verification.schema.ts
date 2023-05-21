@@ -5,11 +5,14 @@ import { UserId } from '../user/user.model';
 export type VerificationCode = string;
 export type UserVerificationId = string;
 
+export type UserVerificationResponse = UserVerification & {
+  _id: UserVerificationId;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 @Schema({ collection: 'verification_codes', timestamps: true })
 export class UserVerification extends Document {
-  @Prop({ required: true, unique: true })
-  _id: UserVerificationId;
-
   @Prop({ required: true, unique: true })
   verificationCode: VerificationCode;
 
@@ -21,12 +24,6 @@ export class UserVerification extends Document {
 
   @Prop({ required: true })
   expirationInMinutes: number;
-
-  @Prop({ type: Date, required: true })
-  createdAt: Date;
-
-  @Prop({ type: Date, required: true })
-  updatedAt: Date;
 }
 
 export const UserVerificationSchema =

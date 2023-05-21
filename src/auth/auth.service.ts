@@ -9,6 +9,7 @@ import { RegisterUserDto } from './dtos';
 import { UserService } from './modules/user/user.service';
 import { CryptoService } from './modules/crypto/crypto.service';
 import { VerificationService } from './modules/verification/verification.service';
+import { VerificationCode } from './modules/verification/verification.schema';
 
 @Injectable()
 export class AuthService {
@@ -40,19 +41,51 @@ export class AuthService {
     const userVerification =
       await this.verificationService.createUserVerification(user.id);
 
-    console.log(userVerification); // todo: remove me
-
     return {
       verificationCode: userVerification.verificationCode,
     };
   }
 
-  async activate() {
-    return 'todo';
+  async activate(verificationCode: VerificationCode) {
+    const userVerification =
+      await this.verificationService.getByVerificationCode(verificationCode);
+
+    if (!userVerification) {
+      this.logger.log(
+        `User verification with given code does not exist. verificationCode: [${verificationCode}]`,
+      );
+      throw new BadRequestException('Invalid verification code');
+    }
+
+    const user = await this.userService.getById(userVerification.userId);
+    if (!user) {
+      this.logger.log(
+        `User with given id does not exist. userId: [${userVerification.userId}]`,
+      );
+      throw new BadRequestException('Invalid verification code');
+    }
+
+    const isExpired = await this.verificationService.checkIfCodeIsExpired(
+      userVerification,
+    );
+    if (isExpired) {
+      this.logger.log(
+        `Tried to activate user with an expired code. verificationCode: [${verificationCode}], userId: [${user.id}]`,
+      );
+      throw new BadRequestException('Verification code is already expired');
+    }
+
+    const { email, isActive } = await this.userService.activateUser(user);
+    await this.verificationService.markVerificationAsUsed(userVerification._id);
+
+    return {
+      email,
+      isActive,
+    };
   }
 
   async login() {
-    return 'todo';
+    return this.verificationService.getAll();
   }
 
   async refreshTokens() {

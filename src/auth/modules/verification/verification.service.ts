@@ -1,8 +1,13 @@
 import { Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { addMinutes, isAfter } from 'date-fns';
 import { VerificationRepository } from './verification.repository';
 import { UserId } from '../user/user.model';
-import { UserVerification, VerificationCode } from './verification.schema';
+import {
+  UserVerificationId,
+  UserVerificationResponse,
+  VerificationCode,
+} from './verification.schema';
 
 @Injectable()
 export class VerificationService {
@@ -12,7 +17,7 @@ export class VerificationService {
   ) {}
 
   async createUserVerification(userId: UserId) {
-    const verificationCode = this.getVerificationCode();
+    const verificationCode = this.generateVerificationCode();
     const expirationInMinutes = Number(
       process.env.VERIFICATION_CODE_EXPIRATION_IN_MINUTES,
     );
@@ -30,22 +35,27 @@ export class VerificationService {
     return userVerification;
   }
 
-  async checkIfCodeIsExpired(code: VerificationCode) {
-    const userVerification =
-      await this.verificationRepository.getByVerificationCode(code);
+  async checkIfCodeIsExpired(userVerification: UserVerificationResponse) {
+    const { expirationInMinutes, createdAt } = userVerification;
+    const now = new Date();
+    const expirationTime = addMinutes(createdAt, expirationInMinutes);
 
-    if (!userVerification) {
-      this.logger.log(
-        `User verification was not found. verificationCode: [${code}]`,
-      );
-    }
+    return isAfter(now, expirationTime);
   }
 
-  private getVerificationCode() {
+  async getByVerificationCode(code: VerificationCode) {
+    return this.verificationRepository.getByVerificationCode(code);
+  }
+
+  async markVerificationAsUsed(id: UserVerificationId) {
+    return this.verificationRepository.update(id, { isUsed: true });
+  }
+
+  async getAll() {
+    return this.verificationRepository.getAll(); // todo: remove me
+  }
+
+  private generateVerificationCode() {
     return randomUUID();
-  }
-
-  private isExpired(userVerification: UserVerification) {
-    return true;
   }
 }

@@ -45,5 +45,6 @@ export class User {
 
   activate() {
     this.isActive = true;
+    return this;
   }
 }
