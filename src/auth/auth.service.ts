@@ -11,8 +11,8 @@ import { LoginUserDto, RegisterUserDto } from './dtos';
 import { UserService } from './modules/user/user.service';
 import { CryptoService } from './modules/crypto/crypto.service';
 import { VerificationService } from './modules/verification/verification.service';
-import { VerificationCode } from './modules/verification/verification.schema';
 import { User, UserId } from './modules/user/user.model';
+import { VerificationCode } from './modules/verification/verification.model';
 
 interface JwtPayload {
   sub: UserId;
@@ -34,8 +34,10 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterUserDto) {
+    console.log('invoking register method');
     const userExists = await this.userService.getByEmail(dto.email);
     if (userExists) {
+      console.log('checking user existence');
       this.logger.log(
         `User with given email already exists. Email: [${dto.email}]`,
       );
@@ -81,15 +83,18 @@ export class AuthService {
     const isExpired = await this.verificationService.checkIfCodeIsExpired(
       userVerification,
     );
-    if (isExpired) {
+    const { isUsed } = userVerification;
+    if (isExpired || isUsed) {
       this.logger.log(
-        `Tried to activate user with an expired code. verificationCode: [${verificationCode}], userId: [${user.id}]`,
+        `Tried to activate user with an expired or used code. verificationCode: [${verificationCode}], userId: [${user.id}], isUsed: [${isUsed}], isExpired: [${isExpired}]`,
       );
-      throw new BadRequestException('Verification code is already expired');
+      throw new BadRequestException(
+        'Verification code is already expired or used',
+      );
     }
 
     const { email, isActive } = await this.userService.activateUser(user);
-    await this.verificationService.markVerificationAsUsed(userVerification._id);
+    await this.verificationService.markVerificationAsUsed(userVerification.id);
 
     return {
       email,

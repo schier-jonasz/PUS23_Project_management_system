@@ -1,19 +1,21 @@
 import { Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { addMinutes, isAfter } from 'date-fns';
-import { VerificationRepository } from './verification.repository';
 import { UserId } from '../user/user.model';
 import {
-  UserVerificationId,
-  UserVerificationResponse,
   VerificationCode,
-} from './verification.schema';
+  UserVerificationId,
+  Verification,
+} from './verification.model';
 
 @Injectable()
 export class VerificationService {
   constructor(
-    private verificationRepository: VerificationRepository,
+    @InjectRepository(Verification)
+    private verificationRepository: Repository<Verification>,
     private configService: ConfigService,
     @Inject(Logger) private readonly logger: LoggerService,
   ) {}
@@ -23,7 +25,6 @@ export class VerificationService {
     const expirationInMinutes = Number(
       this.configService.get('VERIFICATION_CODE_EXPIRATION_IN_MINUTES'),
     );
-    console.log({ expirationInMinutes });
 
     const userVerification = await this.verificationRepository.save({
       verificationCode,
@@ -38,7 +39,7 @@ export class VerificationService {
     return userVerification;
   }
 
-  async checkIfCodeIsExpired(userVerification: UserVerificationResponse) {
+  async checkIfCodeIsExpired(userVerification: Verification) {
     const { expirationInMinutes, createdAt } = userVerification;
     const now = new Date();
     const expirationTime = addMinutes(createdAt, expirationInMinutes);
@@ -46,8 +47,8 @@ export class VerificationService {
     return isAfter(now, expirationTime);
   }
 
-  async getByVerificationCode(code: VerificationCode) {
-    return this.verificationRepository.getByVerificationCode(code);
+  async getByVerificationCode(verificationCode: VerificationCode) {
+    return this.verificationRepository.findOne({ where: { verificationCode } });
   }
 
   async markVerificationAsUsed(id: UserVerificationId) {

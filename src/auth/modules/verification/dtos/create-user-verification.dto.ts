@@ -1,4 +1,4 @@
-import { VerificationCode } from '../verification.schema';
+import { VerificationCode } from '../verification.model';
 import { UserId } from '../../user/user.model';
 
 export class CreateUserVerificationDto {
