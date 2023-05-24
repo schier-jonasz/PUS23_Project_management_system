@@ -34,10 +34,8 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterUserDto) {
-    console.log('invoking register method');
     const userExists = await this.userService.getByEmail(dto.email);
     if (userExists) {
-      console.log('checking user existence');
       this.logger.log(
         `User with given email already exists. Email: [${dto.email}]`,
       );
