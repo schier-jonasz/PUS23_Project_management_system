@@ -1,7 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
-import { VerificationService } from './verification.service';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { VerificationService } from './verification.service';
 import { Verification } from './verification.model';
 
 @Module({

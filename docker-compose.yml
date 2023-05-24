@@ -41,7 +41,7 @@ services:
       - my-network
 
   redis:
-    image: 'redis:latest'
+    image: redis:latest
     ports:
       - '${REDIS_PORT}:${REDIS_PORT}'
     environment:
@@ -66,6 +66,7 @@ services:
     depends_on:
       - mongo
       - redis
+      - rabbitmq
 
 networks:
   my-network:

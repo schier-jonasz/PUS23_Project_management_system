@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-
 import {
   HealthCheckService,
   HealthCheck,
@@ -7,11 +6,11 @@ import {
   MongooseHealthIndicator,
   MicroserviceHealthIndicator,
 } from '@nestjs/terminus';
-import { ServiceHealthCheckStatus } from './enums/service-status.enum';
-import { ServiceEnum } from './enums/service.enum';
 import { HealthIndicatorStatus } from '@nestjs/terminus/dist/health-indicator/health-indicator-result.interface';
 import { RedisOptions, Transport } from '@nestjs/microservices';
 import { RmqOptions } from '@nestjs/microservices/interfaces/microservice-configuration.interface';
+import { ServiceHealthCheckStatus } from './enums/service-status.enum';
+import { ServiceEnum } from './enums/service.enum';
 
 @Injectable()
 export class HealthService {

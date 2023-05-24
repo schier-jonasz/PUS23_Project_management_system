@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { RedisOptions, Transport } from '@nestjs/microservices';
-import { RmqOptions } from '@nestjs/microservices/interfaces/microservice-configuration.interface';
+import { RedisOptions, Transport, RmqOptions } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
