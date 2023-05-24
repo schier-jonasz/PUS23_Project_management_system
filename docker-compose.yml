@@ -19,6 +19,7 @@ services:
 
   postgres:
     image: postgres
+    container_name: postgres
     restart: always
     ports:
       - '${POSTGRES_PORT}:${POSTGRES_PORT}'
@@ -42,6 +43,7 @@ services:
 
   redis:
     image: redis:latest
+    container_name: redis
     ports:
       - '${REDIS_PORT}:${REDIS_PORT}'
     environment:
@@ -51,11 +53,12 @@ services:
     networks:
       - my-network
 
-  pus-project:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
     command: npm run start:dev
+    container_name: app
     ports:
       - '${APP_PORT}:${APP_PORT}'
     networks:
