@@ -15,8 +15,6 @@ export class RegisterUserDto {
   lastName: string;
 
   @IsEmail()
-  @IsNotEmpty()
-  @Length(MIN_VARCHAR_LENGTH, MAX_VARCHAR_LENGTH)
   email: string;
 
   @IsString()

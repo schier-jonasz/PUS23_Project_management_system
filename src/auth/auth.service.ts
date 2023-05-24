@@ -51,11 +51,11 @@ export class AuthService {
     });
     this.logger.log(`Successfully created user. email: [${dto.email}]`);
 
-    const userVerification =
+    const { verificationCode } =
       await this.verificationService.createUserVerification(user.id);
 
     return {
-      verificationCode: userVerification.verificationCode,
+      verificationCode,
     };
   }
 
