@@ -4,6 +4,7 @@ import {
   Injectable,
   Logger,
   LoggerService,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -86,7 +87,7 @@ export class AuthService {
       this.logger.log(
         `Tried to activate user with an expired or used code. verificationCode: [${verificationCode}], userId: [${user.id}], isUsed: [${isUsed}], isExpired: [${isExpired}]`,
       );
-      throw new BadRequestException(
+      throw new NotFoundException(
         'Verification code is already expired or used',
       );
     }
