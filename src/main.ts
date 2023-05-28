@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { RedisOptions, Transport } from '@nestjs/microservices';
-import { RmqOptions } from '@nestjs/microservices/interfaces/microservice-configuration.interface';
+import { RedisOptions, Transport, RmqOptions } from '@nestjs/microservices';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const { AppModule } = await import('./app.module');
@@ -17,6 +17,8 @@ async function bootstrap() {
     RABBITMQ_IS_DURABLE,
     APP_PORT,
   } = process.env;
+
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   app.connectMicroservice<RedisOptions>({
     transport: Transport.REDIS,
