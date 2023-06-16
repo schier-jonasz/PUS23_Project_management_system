@@ -12,7 +12,7 @@ import { LoginUserDto, RegisterUserDto } from './dtos';
 import { UserService } from './modules/user/user.service';
 import { CryptoService } from './modules/crypto/crypto.service';
 import { VerificationService } from './modules/verification/verification.service';
-import { User, UserId } from './modules/user/user.model';
+import { User, UserId } from './modules/user/models/user.model';
 import { VerificationCode } from './modules/verification/verification.model';
 
 interface JwtPayload {

@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { CreateUserVerificationDto } from './dtos/create-user-verification.dto';
-import { UserId } from '../user/user.model';
+import { UserId } from '../user/models/user.model';
 
 export type VerificationCode = string;
 export type UserVerificationId = number;

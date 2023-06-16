@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { RegisterUserDto } from '../../dtos';
+import { RegisterUserDto } from '../../../dtos';
 
 export type UserId = number;
 
