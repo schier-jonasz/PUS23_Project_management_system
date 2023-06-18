@@ -1,7 +1,8 @@
 import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
-
-const MIN_VARCHAR_LENGTH = 2;
-const MAX_VARCHAR_LENGTH = 255;
+import {
+  MAX_VARCHAR_LENGTH,
+  MIN_VARCHAR_LENGTH,
+} from '../../../../utils/consts';
 
 export class CreateMemberDto {
   @IsString()

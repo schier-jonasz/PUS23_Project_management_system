@@ -1,10 +1,7 @@
 import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
-import {
-  MAX_VARCHAR_LENGTH,
-  MIN_VARCHAR_LENGTH,
-} from '../../../../utils/consts';
+import { MAX_VARCHAR_LENGTH, MIN_VARCHAR_LENGTH } from '../../utils/consts';
 
-export class CreateTaskDto {
+export class CreateProjectBodyDto {
   @IsString()
   @IsNotEmpty()
   @Length(MIN_VARCHAR_LENGTH, MAX_VARCHAR_LENGTH)
@@ -13,4 +10,10 @@ export class CreateTaskDto {
   @IsString()
   @IsOptional()
   description: string;
+
+  @IsString()
+  startDate: string;
+
+  @IsString()
+  endDate: string;
 }

@@ -5,9 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { CreateProjectDto } from '../dtos';
 import { Member } from '../modules/member/models/member.model';
+import { User } from '../../auth/modules/user/models/user.model';
 
 export type ProjectId = number;
 
@@ -31,6 +33,10 @@ export class Project {
 
   @Column({ type: 'date' })
   endDate: Date;
+
+  // @ManyToOne()
+  @Column()
+  author: User;
 
   // @ManyToMany()
   members: Member[]; // todo: use relation
