@@ -4,5 +4,5 @@ import { ProjectId } from '../models/project.model';
 export class ProjectIdParamDto {
   @IsInt()
   @IsPositive()
-  id: ProjectId;
+  projectId: ProjectId;
 }

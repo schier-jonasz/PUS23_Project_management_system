@@ -1,14 +1,17 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post } from '@nestjs/common';
 import { MemberService } from './member.service';
 import { CreateMemberDto } from './dtos';
+import { ProjectIdParamDto } from '../../dtos';
 
 @Controller('members')
-export class ProjectController {
+export class MemberController {
   constructor(private readonly memberService: MemberService) {}
 
-  @HttpCode(HttpStatus.CREATED)
-  @Post('/')
-  async register(@Body() dto: CreateMemberDto) {
-    return this.memberService.createMember(dto);
+  @Post()
+  async addMember(
+    @Param() { projectId }: ProjectIdParamDto,
+    @Body() dto: CreateMemberDto,
+  ) {
+    return this.memberService.addMemberToProject(projectId, dto);
   }
 }

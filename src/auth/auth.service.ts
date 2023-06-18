@@ -8,20 +8,12 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { LoginUserDto, RegisterUserDto } from './dtos';
+import { JwtPayload, LoginUserDto, RegisterUserDto } from './dtos';
 import { UserService } from './modules/user/user.service';
 import { CryptoService } from './modules/crypto/crypto.service';
 import { VerificationService } from './modules/verification/verification.service';
 import { User, UserId } from './modules/user/models/user.model';
 import { VerificationCode } from './modules/verification/verification.model';
-
-interface JwtPayload {
-  sub: UserId;
-  firstName: string;
-  lastName: string;
-  email: string;
-  isActive: boolean;
-}
 
 @Injectable()
 export class AuthService {

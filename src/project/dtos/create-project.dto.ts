@@ -1,9 +1,10 @@
-import { User } from '../../auth/modules/user/models/user.model';
+import { Member } from '../modules/member/models/member.model';
 
 export class CreateProjectDto {
   name: string;
   description?: string | null;
-  author: User;
+  author: Member;
+  members?: Member[];
   startDate: string;
   endDate: string;
 }

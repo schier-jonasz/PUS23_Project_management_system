@@ -9,19 +9,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProjectBodyDto, UpdateProjectBodyDto } from './dtos';
 import { Project, ProjectId } from './models/project.model';
-import { User, UserId } from '../auth/modules/user/models/user.model';
+import { Member } from './modules/member/models/member.model';
+import { JwtPayload } from '../auth/dtos';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectRepository(Project) private projectRepository: Repository<Project>,
-    @InjectRepository(User) private userRepository: Repository<User>,
     @Inject(Logger)
     private readonly logger: LoggerService,
   ) {}
 
-  async createProject(dto: CreateProjectBodyDto, userId: UserId) {
-    const author = await this.getAuthor(userId);
+  async createProject(dto: CreateProjectBodyDto, userPayload: JwtPayload) {
+    const { firstName, lastName, email } = userPayload;
+    const author = new Member({ firstName, lastName, email });
 
     const project = new Project({ ...dto, author });
     this.logger.log(`Creating project: ${project.name}`);
@@ -43,8 +44,11 @@ export class ProjectService {
     return project;
   }
 
-  async getUserProjects(userId: UserId) {
-    return userId;
+  async getUserProjects(email: string) {
+    // todo: where members emails = email
+    return this.projectRepository.find({
+      where: [{ author: { email } }, { members: [] }],
+    });
   }
 
   async deleteProject(projectId: ProjectId) {
@@ -59,14 +63,5 @@ export class ProjectService {
     const updatedProject = new Project({ ...project, ...dto });
 
     await this.projectRepository.save(updatedProject);
-  }
-
-  private async getAuthor(userId: UserId) {
-    const author = await this.userRepository.findOneBy({ id: userId });
-    if (!author) {
-      throw new NotFoundException('User with given ID was not found');
-    }
-
-    return author;
   }
 }

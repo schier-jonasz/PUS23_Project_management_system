@@ -5,10 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { CreateCommentDto } from '../dtos';
-import { MemberId } from '../../../../member/models/member.model';
-import { TaskId } from '../../../models/task.model';
+import { Task } from '../../../models/task.model';
+import { User } from '../../../../../../auth/modules/user/models/user.model';
 
 export type CommentId = number;
 
@@ -24,11 +25,13 @@ export class Comment {
   @Column()
   text: string;
 
+  // @ManyToOne()
   @Column()
-  taskId: TaskId; // todo: use relation
+  task: Task; // todo: use relation
 
+  // @ManyToOne()
   @Column()
-  authorId: MemberId; // todo: use relation
+  author: User; // todo: use relation
 
   @CreateDateColumn()
   createdAt: Date;

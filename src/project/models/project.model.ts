@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { CreateProjectDto } from '../dtos';
 import { Member } from '../modules/member/models/member.model';
-import { User } from '../../auth/modules/user/models/user.model';
+import { Task } from '../modules/task/models/task.model';
 
 export type ProjectId = number;
 
@@ -36,13 +36,13 @@ export class Project {
 
   // @ManyToOne()
   @Column()
-  author: User;
+  author: Member; // todo: use relation
 
   // @ManyToMany()
   members: Member[]; // todo: use relation
 
   // @OneToMany()
-  tasks: Member[]; // todo: use relation
+  tasks: Task[]; // todo: use relation
 
   @CreateDateColumn()
   createdAt: Date;

@@ -13,6 +13,15 @@ import {
   UpdateProjectBodyDto,
 } from './dtos';
 import { ProjectService } from './project.service';
+import { JwtPayload } from '../auth/dtos';
+
+const userPayload: JwtPayload = {
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'john@doe.com',
+  isActive: true,
+  sub: 1,
+};
 
 @Controller('projects')
 export class ProjectController {
@@ -20,36 +29,36 @@ export class ProjectController {
 
   @Post()
   async createProject(@Body() dto: CreateProjectBodyDto) {
-    // todo: get id from token
-    const userId = 1;
-    return this.projectService.createProject(dto, userId);
+    // todo: get payload from token
+
+    return this.projectService.createProject(dto, userPayload);
   }
 
   @Get()
   async getUserProjects() {
     // todo: get id from token
-    const userId = 1;
-    return this.projectService.getUserProjects(userId);
+    const { email } = userPayload;
+    return this.projectService.getUserProjects(email);
   }
 
   @Get(':id')
-  async getById(@Param() { id }: ProjectIdParamDto) {
+  async getById(@Param() { projectId }: ProjectIdParamDto) {
     // todo: check if is author or member
-    return this.projectService.getById(id);
+    return this.projectService.getById(projectId);
   }
 
   @Patch(':id')
   async updateProject(
-    @Param() { id }: ProjectIdParamDto,
+    @Param() { projectId }: ProjectIdParamDto,
     @Body() dto: UpdateProjectBodyDto,
   ) {
     // todo: check if is author or member
-    return this.projectService.updateProject(id, dto);
+    return this.projectService.updateProject(projectId, dto);
   }
 
   @Delete(':id')
-  async deleteProject(@Param() { id }: ProjectIdParamDto) {
+  async deleteProject(@Param() { projectId }: ProjectIdParamDto) {
     // todo: check if is author
-    return this.projectService.deleteProject(id);
+    return this.projectService.deleteProject(projectId);
   }
 }

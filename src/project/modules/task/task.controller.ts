@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { CreateTaskDto } from './dtos';
 import { TaskService } from './task.service';
 
@@ -6,9 +6,8 @@ import { TaskService } from './task.service';
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
-  @HttpCode(HttpStatus.CREATED)
-  @Post('/')
-  async register(@Body() dto: CreateTaskDto) {
+  @Post()
+  async createTask(@Body() dto: CreateTaskDto) {
     return this.taskService.createTask(dto);
   }
 }
