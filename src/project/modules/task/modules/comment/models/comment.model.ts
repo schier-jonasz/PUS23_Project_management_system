@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { CreateCommentDto } from '../dtos';
 import { Task } from '../../../models/task.model';
-import { User } from '../../../../../../auth/modules/user/models/user.model';
+import { Member } from '../../../../member/models/member.model';
 
 export type CommentId = number;
 
@@ -31,7 +31,7 @@ export class Comment {
 
   // @ManyToOne()
   @Column()
-  author: User; // todo: use relation
+  author: Member; // todo: use relation
 
   @CreateDateColumn()
   createdAt: Date;

@@ -13,7 +13,8 @@ export class CommentController {
   @Post()
   async addComment(@Body() dto: CreateCommentBodyDto) {
     // todo: is member
-    return this.commentService.createComment(dto);
+    const email = 'todo: get from jwt payload';
+    return this.commentService.createComment(dto, email);
   }
 
   @Get()

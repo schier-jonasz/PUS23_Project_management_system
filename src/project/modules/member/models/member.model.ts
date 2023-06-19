@@ -24,7 +24,7 @@ export class Member {
   @Column()
   lastName: string;
 
-  @Column()
+  @Column() // todo: unique?
   email: string;
 
   @CreateDateColumn()

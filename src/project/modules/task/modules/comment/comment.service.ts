@@ -4,17 +4,23 @@ import { Repository } from 'typeorm';
 import { Comment, CommentId } from './models/comment.model';
 import { CreateCommentBodyDto } from './dtos';
 import { Task, TaskId } from '../../models/task.model';
+import { Member } from '../../../member/models/member.model';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(Comment) private commentRepository: Repository<Comment>,
+    @InjectRepository(Member) private memberRepository: Repository<Member>,
     @InjectRepository(Task) private taskRepository: Repository<Task>,
   ) {}
 
-  public async createComment({ text, taskId }: CreateCommentBodyDto) {
+  public async createComment(
+    { text, taskId }: CreateCommentBodyDto,
+    email: string,
+  ) {
     const task = await this.getTask(taskId);
-    const comment = new Comment({ text, task });
+    const author = await this.getAuthor(email);
+    const comment = new Comment({ text, task, author });
 
     return this.commentRepository.save(comment);
   }
@@ -36,6 +42,15 @@ export class CommentService {
 
   private async getTask(taskId: TaskId) {
     const task = await this.taskRepository.findOneBy({ id: taskId });
+    if (!task) {
+      throw new NotFoundException('Task with given ID was not found');
+    }
+
+    return task;
+  }
+
+  private async getAuthor(email: string) {
+    const task = await this.memberRepository.findOneBy({ email });
     if (!task) {
       throw new NotFoundException('Task with given ID was not found');
     }
