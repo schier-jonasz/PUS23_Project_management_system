@@ -9,7 +9,7 @@ import {
   VerificationCode,
   UserVerificationId,
   Verification,
-} from './verification.model';
+} from './models/verification.model';
 
 @Injectable()
 export class VerificationService {

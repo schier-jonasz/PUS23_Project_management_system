@@ -13,7 +13,7 @@ import { UserService } from './modules/user/user.service';
 import { CryptoService } from './modules/crypto/crypto.service';
 import { VerificationService } from './modules/verification/verification.service';
 import { User, UserId } from './modules/user/models/user.model';
-import { VerificationCode } from './modules/verification/verification.model';
+import { VerificationCode } from './modules/verification/models/verification.model';
 
 @Injectable()
 export class AuthService {
