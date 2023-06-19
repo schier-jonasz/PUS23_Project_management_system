@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 import { MAX_VARCHAR_LENGTH, MIN_VARCHAR_LENGTH } from '../../utils/consts';
 
 export class CreateProjectBodyDto {
@@ -11,9 +17,9 @@ export class CreateProjectBodyDto {
   @IsOptional()
   description: string;
 
-  @IsString()
+  @IsDateString()
   startDate: string;
 
-  @IsString()
+  @IsDateString()
   endDate: string;
 }

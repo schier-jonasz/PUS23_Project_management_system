@@ -11,6 +11,12 @@ export class MemberService {
     @InjectRepository(Member) private memberRepository: Repository<Member>,
   ) {}
 
+  public async createMember(dto: CreateMemberDto) {
+    const member = new Member(dto);
+
+    return this.memberRepository.save(member);
+  }
+
   public async addMemberToProject(projectId: ProjectId, dto: CreateMemberDto) {
     return dto;
   }

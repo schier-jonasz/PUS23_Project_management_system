@@ -7,10 +7,14 @@ import { MemberModule } from './modules/member/member.module';
 import { TaskModule } from './modules/task/task.module';
 import { CommentModule } from './modules/task/modules/comment/comment.module';
 import { AuthModule } from '../auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Project]),
+    JwtModule.register({}),
+    ConfigModule,
     MemberModule,
     TaskModule,
     CommentModule,

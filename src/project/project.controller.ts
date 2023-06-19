@@ -6,6 +6,8 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import {
   CreateProjectBodyDto,
@@ -24,15 +26,11 @@ import {
   GetCommentsParamsDto,
 } from './modules/task/modules/comment/dtos';
 import { CommentService } from './modules/task/modules/comment/comment.service';
+import { AuthGuard } from './guards/auth.guard';
+import { RequestWithUserPayload } from './types/request';
+import { IsMemberGuard } from './guards/is-member.guard';
 
-const userPayload: JwtPayload = {
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john@doe.com',
-  isActive: true,
-  sub: 1,
-};
-
+@UseGuards(AuthGuard)
 @Controller('projects')
 export class ProjectController {
   constructor(
@@ -43,19 +41,19 @@ export class ProjectController {
   ) {}
 
   @Post()
-  async createProject(@Body() dto: CreateProjectBodyDto) {
-    // todo: get payload from token
-
-    return this.projectService.createProject(dto, userPayload);
+  async createProject(
+    @Body() dto: CreateProjectBodyDto,
+    @Req() { user }: RequestWithUserPayload,
+  ) {
+    return this.projectService.createProject(dto, user);
   }
 
   @Get()
-  async getUserProjects() {
-    // todo: get id from token
-    const { email } = userPayload;
-    return this.projectService.getUserProjects(email);
+  async getUserProjects(@Req() { user }: RequestWithUserPayload) {
+    return this.projectService.getUserProjects(user.email);
   }
 
+  @UseGuards(IsMemberGuard)
   @Get(':projectId')
   async getById(@Param() { projectId }: ProjectIdParamDto) {
     // todo: check if is author or member
