@@ -1,13 +1,17 @@
+import 'reflect-metadata';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { CreateTaskDto } from '../dtos';
 import { TaskPriority } from '../enums/task-priority.enum';
 import { Comment } from '../modules/comment/models/comment.model';
+import { Project } from '../../../models/project.model';
 
 export type TaskId = number;
 
@@ -32,8 +36,11 @@ export class Task {
   @Column({ type: 'date' })
   eta: string;
 
-  // @OneToMany()
-  comments: Comment[]; // todo: use relation
+  @OneToMany(() => Comment, (comment) => comment.task)
+  comments: Comment[];
+
+  @ManyToOne(() => Project)
+  project: Project;
 
   @CreateDateColumn()
   createdAt: Date;

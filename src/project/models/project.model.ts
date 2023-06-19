@@ -6,6 +6,8 @@ import {
   UpdateDateColumn,
   OneToMany,
   ManyToOne,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { CreateProjectDto } from '../dtos';
 import { Member } from '../modules/member/models/member.model';
@@ -34,15 +36,15 @@ export class Project {
   @Column({ type: 'date' })
   endDate: Date;
 
-  // @ManyToOne()
-  @Column()
-  author: Member; // todo: use relation
+  @ManyToOne(() => Member)
+  author: Member;
 
-  // @ManyToMany()
-  members: Member[]; // todo: use relation
+  @ManyToMany(() => Member)
+  @JoinTable()
+  members: Member[];
 
-  // @OneToMany()
-  tasks: Task[]; // todo: use relation
+  @OneToMany(() => Task, (task) => task.project)
+  tasks: Task[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { CreateMemberDto } from '../dtos';
+import { Comment } from '../../task/modules/comment/models/comment.model';
 
 export type MemberId = number;
 
@@ -24,8 +26,11 @@ export class Member {
   @Column()
   lastName: string;
 
-  @Column() // todo: unique?
+  @Column({ unique: true })
   email: string;
+
+  @OneToMany(() => Comment, (comment) => comment.author)
+  comments: Comment[];
 
   @CreateDateColumn()
   createdAt: Date;

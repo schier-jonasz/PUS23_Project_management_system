@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import {
   Entity,
   Column,
@@ -25,13 +26,11 @@ export class Comment {
   @Column()
   text: string;
 
-  // @ManyToOne()
-  @Column()
-  task: Task; // todo: use relation
+  @ManyToOne(() => Task, (task) => task.comments)
+  task: Task;
 
-  // @ManyToOne()
-  @Column()
-  author: Member; // todo: use relation
+  @ManyToOne(() => Member, (member) => member.comments)
+  author: Member;
 
   @CreateDateColumn()
   createdAt: Date;
