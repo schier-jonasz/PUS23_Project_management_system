@@ -8,6 +8,7 @@ import {
   ManyToOne,
   ManyToMany,
   JoinTable,
+  DeleteDateColumn,
 } from 'typeorm';
 import { CreateProjectDto } from '../dtos';
 import { Member } from '../modules/member/models/member.model';
@@ -51,4 +52,7 @@ export class Project {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

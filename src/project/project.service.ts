@@ -73,6 +73,6 @@ export class ProjectService {
 
     const updatedProject = new Project({ ...project, ...dto });
 
-    await this.projectRepository.save(updatedProject);
+    return this.projectRepository.save(updatedProject);
   }
 }

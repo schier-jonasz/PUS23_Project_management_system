@@ -18,8 +18,9 @@ export class IsAuthorGuard implements CanActivate {
     const projectId = Number(params.projectId);
 
     const project = await this.projectService.getById(projectId);
+    const isAuthor = project.author.email === user.email;
 
-    if (project.author.email !== user.email) {
+    if (!isAuthor) {
       throw new ForbiddenException('You have to be the author of this project');
     }
 

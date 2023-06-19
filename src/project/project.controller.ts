@@ -4,18 +4,14 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import {
-  CreateProjectBodyDto,
-  ProjectIdParamDto,
-  UpdateProjectBodyDto,
-} from './dtos';
+import { CreateProjectBodyDto, UpdateProjectBodyDto } from './dtos';
 import { ProjectService } from './project.service';
-import { JwtPayload } from '../auth/dtos';
 import { CreateMemberDto } from './modules/member/dtos';
 import { MemberService } from './modules/member/member.service';
 import { CreateTaskDto } from './modules/task/dtos';
@@ -26,9 +22,9 @@ import {
   GetCommentsParamsDto,
 } from './modules/task/modules/comment/dtos';
 import { CommentService } from './modules/task/modules/comment/comment.service';
-import { AuthGuard } from './guards/auth.guard';
 import { RequestWithUserPayload } from './types/request';
-import { IsMemberGuard } from './guards/is-member.guard';
+import { AuthGuard, IsMemberGuard, IsAuthorGuard } from './guards';
+import { ProjectId } from './models/project.model';
 
 @UseGuards(AuthGuard)
 @Controller('projects')
@@ -55,29 +51,29 @@ export class ProjectController {
 
   @UseGuards(IsMemberGuard)
   @Get(':projectId')
-  async getById(@Param() { projectId }: ProjectIdParamDto) {
-    // todo: check if is author or member
+  async getById(@Param('projectId', ParseIntPipe) projectId: ProjectId) {
     return this.projectService.getById(projectId);
   }
 
+  @UseGuards(IsAuthorGuard)
   @Patch(':projectId')
   async updateProject(
-    @Param() { projectId }: ProjectIdParamDto,
+    @Param('projectId', ParseIntPipe) projectId: ProjectId,
     @Body() dto: UpdateProjectBodyDto,
   ) {
-    // todo: check if is author or member
     return this.projectService.updateProject(projectId, dto);
   }
 
+  @UseGuards(IsAuthorGuard)
   @Delete(':projectId')
-  async deleteProject(@Param() { projectId }: ProjectIdParamDto) {
+  async deleteProject(@Param('projectId', ParseIntPipe) projectId: ProjectId) {
     // todo: check if is author
     return this.projectService.deleteProject(projectId);
   }
 
   @Post(':projectId/members')
   async addMember(
-    @Param() { projectId }: ProjectIdParamDto,
+    @Param('projectId', ParseIntPipe) projectId: ProjectId,
     @Body() dto: CreateMemberDto,
   ) {
     return this.memberService.addMemberToProject(projectId, dto);

@@ -18,8 +18,11 @@ export class IsMemberGuard implements CanActivate {
     const projectId = Number(params.projectId);
 
     const project = await this.projectService.getById(projectId);
+    const isMember = project.members.some(
+      (member) => member.email === user.email,
+    );
 
-    if (project.members.some((member) => member.email === user.email)) {
+    if (!isMember) {
       throw new ForbiddenException('You have to be member of this project');
     }
 
