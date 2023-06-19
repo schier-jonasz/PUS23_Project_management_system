@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { RedisOptions, Transport, RmqOptions } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
