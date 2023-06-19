@@ -10,7 +10,7 @@ export class TaskService {
     @InjectRepository(Task) private taskRepository: Repository<Task>,
   ) {}
 
-  public async createTask(dto: CreateTaskDto) {
+  async createTask(dto: CreateTaskDto) {
     return dto;
   }
 }

@@ -14,10 +14,7 @@ export class CommentService {
     @InjectRepository(Task) private taskRepository: Repository<Task>,
   ) {}
 
-  public async createComment(
-    { text, taskId }: CreateCommentBodyDto,
-    email: string,
-  ) {
+  async createComment({ text, taskId }: CreateCommentBodyDto, email: string) {
     const task = await this.getTask(taskId);
     const author = await this.getAuthor(email);
     const comment = new Comment({ text, task, author });
@@ -25,13 +22,13 @@ export class CommentService {
     return this.commentRepository.save(comment);
   }
 
-  public async getComments(taskId: TaskId) {
+  async getComments(taskId: TaskId) {
     await this.getTask(taskId);
 
     return this.commentRepository.find({ where: { task: { id: taskId } } });
   }
 
-  public async deleteComment(commentId: CommentId) {
+  async deleteComment(commentId: CommentId) {
     const comment = await this.commentRepository.findOneBy({ id: commentId });
     if (!comment) {
       throw new NotFoundException('Task with given ID was not found');

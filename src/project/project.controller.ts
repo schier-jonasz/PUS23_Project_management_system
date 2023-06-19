@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { CreateProjectBodyDto, UpdateProjectBodyDto } from './dtos';
 import { ProjectService } from './project.service';
-import { CreateMemberDto } from './modules/member/dtos';
+import { CreateMemberBodyDto } from './modules/member/dtos';
 import { MemberService } from './modules/member/member.service';
 import { CreateTaskDto } from './modules/task/dtos';
 import { TaskService } from './modules/task/task.service';
@@ -26,6 +26,7 @@ import { RequestWithUserPayload } from './types/request';
 import { AuthGuard, IsMemberGuard, IsAuthorGuard } from './guards';
 import { ProjectId } from './models/project.model';
 import { ConfigService } from '@nestjs/config';
+import { MemberId } from './modules/member/models/member.model';
 
 @UseGuards(AuthGuard)
 @Controller('projects')
@@ -59,9 +60,9 @@ export class ProjectController {
 
   @UseGuards(IsMemberGuard)
   @Get(':projectId')
-  async getById(@Param('projectId', ParseIntPipe) projectId: ProjectId) {
+  async getProjectById(@Param('projectId', ParseIntPipe) projectId: ProjectId) {
     const project = await this.projectService.getById(projectId);
-    const path = `/projects/${project.id}`;
+    const path = `/projects/${projectId}`;
 
     return this.sendHateoasResponse(project, path);
   }
@@ -73,7 +74,7 @@ export class ProjectController {
     @Body() dto: UpdateProjectBodyDto,
   ) {
     const project = await this.projectService.updateProject(projectId, dto);
-    const path = `/projects/${project.id}`;
+    const path = `/projects/${projectId}`;
 
     return this.sendHateoasResponse(project, path);
   }
@@ -84,35 +85,63 @@ export class ProjectController {
     return this.projectService.deleteProject(projectId);
   }
 
+  @UseGuards(IsAuthorGuard)
   @Post(':projectId/members')
-  async addMember(
+  async addMemberToProject(
     @Param('projectId', ParseIntPipe) projectId: ProjectId,
-    @Body() dto: CreateMemberDto,
+    @Body() { userId }: CreateMemberBodyDto,
   ) {
-    return this.memberService.addMemberToProject(projectId, dto);
+    const project = await this.projectService.addMemberToProject(
+      projectId,
+      userId,
+    );
+    const path = `/projects/${projectId}/members`;
+
+    return this.sendHateoasResponse(project, path);
   }
 
+  @UseGuards(IsAuthorGuard)
+  @Delete(':projectId/members/:memberId')
+  async removeMemberFromProject(
+    @Param('projectId', ParseIntPipe) projectId: ProjectId,
+    @Param('memberId', ParseIntPipe) memberId: MemberId,
+  ) {
+    return this.projectService.removeMemberFromProject(projectId, memberId);
+  }
+
+  @UseGuards(IsMemberGuard)
+  @Get(':projectId/members')
+  async getProjectMembers(
+    @Param('projectId', ParseIntPipe) projectId: ProjectId,
+  ) {
+    const members = await this.projectService.getProjectMembers(projectId);
+    const path = `/projects/${projectId}/members`;
+
+    return this.sendHateoasResponse(members, path);
+  }
+
+  @UseGuards(IsMemberGuard)
   @Post(':projectId/tasks')
   async createTask(@Body() dto: CreateTaskDto) {
     return this.taskService.createTask(dto);
   }
 
+  @UseGuards(IsMemberGuard)
   @Post(':projectId/tasks/:taskId/comments')
   async addComment(@Body() dto: CreateCommentBodyDto) {
-    // todo: is member
     const email = 'todo: get from jwt payload';
     return this.commentService.createComment(dto, email);
   }
 
+  @UseGuards(IsMemberGuard)
   @Get(':projectId/tasks/:taskId/comments')
   async getComments(@Param() { taskId }: GetCommentsParamsDto) {
-    // todo: is member
     return this.commentService.getComments(taskId);
   }
 
+  @UseGuards(IsMemberGuard)
   @Delete(':projectId/tasks/:taskId/comments/:commentId')
   async deleteComment(@Param() { commentId }: CommentIdParamDto) {
-    // todo: is member
     return this.commentService.deleteComment(commentId);
   }
 
