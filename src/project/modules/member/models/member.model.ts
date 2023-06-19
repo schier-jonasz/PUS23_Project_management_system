@@ -26,7 +26,7 @@ export class Member {
   @Column()
   lastName: string;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
   @OneToMany(() => Comment, (comment) => comment.author)

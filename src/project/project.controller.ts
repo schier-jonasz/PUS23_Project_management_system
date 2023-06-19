@@ -25,6 +25,7 @@ import { CommentService } from './modules/task/modules/comment/comment.service';
 import { RequestWithUserPayload } from './types/request';
 import { AuthGuard, IsMemberGuard, IsAuthorGuard } from './guards';
 import { ProjectId } from './models/project.model';
+import { ConfigService } from '@nestjs/config';
 
 @UseGuards(AuthGuard)
 @Controller('projects')
@@ -34,6 +35,7 @@ export class ProjectController {
     private readonly memberService: MemberService,
     private readonly taskService: TaskService,
     private readonly commentService: CommentService,
+    private readonly config: ConfigService,
   ) {}
 
   @Post()
@@ -41,18 +43,27 @@ export class ProjectController {
     @Body() dto: CreateProjectBodyDto,
     @Req() { user }: RequestWithUserPayload,
   ) {
-    return this.projectService.createProject(dto, user);
+    const project = await this.projectService.createProject(dto, user);
+    const path = `/projects/${project.id}`;
+
+    return this.sendHateoasResponse(project, path);
   }
 
   @Get()
   async getUserProjects(@Req() { user }: RequestWithUserPayload) {
-    return this.projectService.getUserProjects(user.email);
+    const projects = await this.projectService.getUserProjects(user.email);
+    const path = `/projects`;
+
+    return this.sendHateoasResponse(projects, path);
   }
 
   @UseGuards(IsMemberGuard)
   @Get(':projectId')
   async getById(@Param('projectId', ParseIntPipe) projectId: ProjectId) {
-    return this.projectService.getById(projectId);
+    const project = await this.projectService.getById(projectId);
+    const path = `/projects/${project.id}`;
+
+    return this.sendHateoasResponse(project, path);
   }
 
   @UseGuards(IsAuthorGuard)
@@ -61,13 +72,15 @@ export class ProjectController {
     @Param('projectId', ParseIntPipe) projectId: ProjectId,
     @Body() dto: UpdateProjectBodyDto,
   ) {
-    return this.projectService.updateProject(projectId, dto);
+    const project = await this.projectService.updateProject(projectId, dto);
+    const path = `/projects/${project.id}`;
+
+    return this.sendHateoasResponse(project, path);
   }
 
   @UseGuards(IsAuthorGuard)
   @Delete(':projectId')
   async deleteProject(@Param('projectId', ParseIntPipe) projectId: ProjectId) {
-    // todo: check if is author
     return this.projectService.deleteProject(projectId);
   }
 
@@ -101,5 +114,17 @@ export class ProjectController {
   async deleteComment(@Param() { commentId }: CommentIdParamDto) {
     // todo: is member
     return this.commentService.deleteComment(commentId);
+  }
+
+  private sendHateoasResponse<T>(data: T, path: string) {
+    const port = this.config.get('APP_PORT');
+    const apiUrl = `http://localhost:${port}`;
+
+    return {
+      data,
+      _links: {
+        self: `${apiUrl}${path}`,
+      },
+    };
   }
 }
