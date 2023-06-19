@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { UserModule } from './modules/user/user.module';
 import { CryptoModule } from './modules/crypto/crypto.module';
 import { VerificationModule } from './modules/verification/verification.module';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { VerificationModule } from './modules/verification/verification.module';
     JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService, ConfigService, Logger],
+  providers: [AuthService, ConfigService, AuthGuard, Logger],
+  exports: [AuthGuard],
 })
 export class AuthModule {}
