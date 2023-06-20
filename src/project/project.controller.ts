@@ -16,11 +16,7 @@ import { CreateProjectBodyDto, UpdateProjectBodyDto } from './dtos';
 import { ProjectService } from './project.service';
 import { CreateMemberBodyDto } from './modules/member/dtos';
 import { CreateTaskBodyDto, UpdateTaskBodyDto } from './modules/task/dtos';
-import {
-  CommentIdParamDto,
-  CreateCommentBodyDto,
-  GetCommentsParamsDto,
-} from './modules/task/modules/comment/dtos';
+import { CreateCommentBodyDto } from './modules/task/modules/comment/dtos';
 import { CommentService } from './modules/task/modules/comment/comment.service';
 import { RequestWithUserPayload } from './types/request';
 import { AuthGuard, IsMemberGuard, IsAuthorGuard } from './guards';
@@ -29,6 +25,7 @@ import { ConfigService } from '@nestjs/config';
 import { MemberId } from './modules/member/models/member.model';
 import { TaskId } from './modules/task/models/task.model';
 import { TaskService } from './modules/task/task.service';
+import { CommentId } from './modules/task/modules/comment/models/comment.model';
 
 @UseGuards(AuthGuard)
 @Controller('projects')
@@ -174,26 +171,43 @@ export class ProjectController {
   @UseGuards(IsMemberGuard)
   @Delete(':projectId/tasks/:taskId')
   async deleteTask(@Param('taskId', ParseIntPipe) taskId: TaskId) {
-    await this.taskService.deleteTask(taskId);
+    return this.taskService.deleteTask(taskId);
   }
 
   @UseGuards(IsMemberGuard)
   @Post(':projectId/tasks/:taskId/comments')
-  async addComment(@Body() dto: CreateCommentBodyDto) {
-    const email = 'todo: get from jwt payload';
-    return this.commentService.createComment(dto, email);
+  async addComment(
+    @Param('projectId', ParseIntPipe) projectId: ProjectId,
+    @Param('taskId', ParseIntPipe) taskId: TaskId,
+    @Body() dto: CreateCommentBodyDto,
+    @Req() { user }: RequestWithUserPayload,
+  ) {
+    const comment = await this.commentService.createComment(
+      dto,
+      taskId,
+      user.email,
+    );
+    const path = `/projects/${projectId}/tasks/${taskId}/comments/${comment.id}`;
+
+    return this.sendHateoasResponse(comment, path);
   }
 
   @UseGuards(IsMemberGuard)
   @Get(':projectId/tasks/:taskId/comments')
-  async getComments(@Param() { taskId }: GetCommentsParamsDto) {
-    return this.commentService.getComments(taskId);
+  async getComments(
+    @Param('projectId', ParseIntPipe) projectId: ProjectId,
+    @Param('taskId', ParseIntPipe) taskId: TaskId,
+  ) {
+    const comments = await this.commentService.getComments(taskId);
+    const path = `/projects/${projectId}/tasks/${taskId}/comments`;
+
+    return this.sendHateoasResponse(comments, path);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(IsMemberGuard)
   @Delete(':projectId/tasks/:taskId/comments/:commentId')
-  async deleteComment(@Param() { commentId }: CommentIdParamDto) {
+  async deleteComment(@Param('commentId', ParseIntPipe) commentId: CommentId) {
     return this.commentService.deleteComment(commentId);
   }
 

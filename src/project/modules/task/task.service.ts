@@ -34,8 +34,8 @@ export class TaskService {
   }
 
   async deleteTask(taskId: TaskId) {
-    const task = await this.getTaskById(taskId);
+    await this.getTaskById(taskId);
 
-    return this.taskRepository.remove(task);
+    return this.taskRepository.softDelete({ id: taskId });
   }
 }

@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   ManyToOne,
   OneToMany,
 } from 'typeorm';
@@ -35,7 +36,7 @@ export class Task {
   @Column({ type: 'date' })
   eta: string;
 
-  @OneToMany(() => Comment, (comment) => comment.task, { onDelete: 'CASCADE' })
+  @OneToMany(() => Comment, (comment) => comment.task)
   comments: Comment[];
 
   @ManyToOne(() => Project)
@@ -46,4 +47,7 @@ export class Task {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

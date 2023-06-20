@@ -14,7 +14,11 @@ export class CommentService {
     @InjectRepository(Task) private taskRepository: Repository<Task>,
   ) {}
 
-  async createComment({ text, taskId }: CreateCommentBodyDto, email: string) {
+  async createComment(
+    { text }: CreateCommentBodyDto,
+    taskId: TaskId,
+    email: string,
+  ) {
     const task = await this.getTask(taskId);
     const author = await this.getAuthor(email);
     const comment = new Comment({ text, task, author });
@@ -25,7 +29,10 @@ export class CommentService {
   async getComments(taskId: TaskId) {
     await this.getTask(taskId);
 
-    return this.commentRepository.find({ where: { task: { id: taskId } } });
+    return this.commentRepository.find({
+      where: { task: { id: taskId } },
+      order: { createdAt: 'ASC' },
+    });
   }
 
   async deleteComment(commentId: CommentId) {
@@ -34,7 +41,7 @@ export class CommentService {
       throw new NotFoundException('Task with given ID was not found');
     }
 
-    await this.commentRepository.remove(comment);
+    await this.commentRepository.softDelete({ id: commentId });
   }
 
   private async getTask(taskId: TaskId) {
