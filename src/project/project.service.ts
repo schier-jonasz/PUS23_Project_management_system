@@ -15,6 +15,8 @@ import { CreateMemberDto } from './modules/member/dtos';
 import { UserId } from '../auth/modules/user/models/user.model';
 import { UserService } from '../auth/modules/user/user.service';
 import { MemberId } from './modules/member/models/member.model';
+import { CreateTaskBodyDto } from './modules/task/dtos';
+import { TaskService } from './modules/task/task.service';
 
 @Injectable()
 export class ProjectService {
@@ -23,6 +25,7 @@ export class ProjectService {
     private readonly projectRepository: Repository<Project>,
     private readonly memberService: MemberService,
     private readonly userService: UserService,
+    private readonly taskService: TaskService,
     @Inject(Logger)
     private readonly logger: LoggerService,
   ) {}
@@ -106,7 +109,9 @@ export class ProjectService {
       members: projectMembers,
     };
 
-    return this.projectRepository.save(updatedProject);
+    await this.projectRepository.save(updatedProject);
+
+    return newMember;
   }
 
   async removeMemberFromProject(projectId: ProjectId, memberId: MemberId) {
@@ -133,5 +138,34 @@ export class ProjectService {
     const project = await this.getById(projectId);
 
     return project.members;
+  }
+
+  async addTaskToProject(
+    projectId: ProjectId,
+    createTaskDto: CreateTaskBodyDto,
+  ) {
+    this.logger.log(`Adding task to project with ID: ${projectId}`);
+
+    const project = await this.getById(projectId);
+
+    const newTask = await this.taskService.createTask(createTaskDto);
+    const projectTasks = [...project.tasks, newTask];
+
+    const updatedProject: Partial<Project> = {
+      id: projectId,
+      tasks: projectTasks,
+    };
+
+    await this.projectRepository.save(updatedProject);
+
+    return newTask;
+  }
+
+  async getProjectTasks(projectId: ProjectId) {
+    this.logger.log(`Fetching tasks from project with ID: ${projectId}`);
+
+    const project = await this.getById(projectId);
+
+    return project.tasks;
   }
 }

@@ -7,7 +7,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { CreateTaskDto } from '../dtos';
+import { CreateTaskBodyDto } from '../dtos';
 import { TaskPriority } from '../enums/task-priority.enum';
 import { Comment } from '../modules/comment/models/comment.model';
 import { Project } from '../../../models/project.model';
@@ -16,7 +16,7 @@ export type TaskId = number;
 
 @Entity()
 export class Task {
-  constructor(dto: CreateTaskDto) {
+  constructor(dto: CreateTaskBodyDto) {
     return Object.assign(this, dto);
   }
 
@@ -35,7 +35,7 @@ export class Task {
   @Column({ type: 'date' })
   eta: string;
 
-  @OneToMany(() => Comment, (comment) => comment.task)
+  @OneToMany(() => Comment, (comment) => comment.task, { onDelete: 'CASCADE' })
   comments: Comment[];
 
   @ManyToOne(() => Project)
