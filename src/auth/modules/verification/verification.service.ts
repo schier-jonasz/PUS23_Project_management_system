@@ -4,12 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { addMinutes, isAfter } from 'date-fns';
-import { UserId } from '../user/user.model';
+import { UserId } from '../user/models/user.model';
 import {
   VerificationCode,
   UserVerificationId,
   Verification,
-} from './verification.model';
+} from './models/verification.model';
 
 @Injectable()
 export class VerificationService {

@@ -1,6 +1,6 @@
 import { Logger, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserModule } from './modules/user/user.module';
@@ -12,9 +12,10 @@ import { VerificationModule } from './modules/verification/verification.module';
     UserModule,
     CryptoModule,
     VerificationModule,
+    ConfigModule,
     JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService, ConfigService, Logger],
+  providers: [AuthService, Logger],
 })
 export class AuthModule {}
